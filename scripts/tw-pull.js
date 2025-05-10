@@ -203,19 +203,6 @@ const isDirectorySync = path => {
  * @param {NestedRecord<string, string>} messages
  * @returns {Record<string, string>}
  */
-const generateSmallestLocaleNamesMap = messages => {
-    const lowercaseSupportedLocales = {};
-    for (const [locale, value] of Object.entries(supportedLocales)) {
-        lowercaseSupportedLocales[locale.toLowerCase()] = value;
-    }
-    const result = {
-        [SOURCE_LOCALE]: supportedLocales[SOURCE_LOCALE].name
-    };
-    for (const locale of Object.keys(messages)) {
-        result[locale] = lowercaseSupportedLocales[locale].name;
-    }
-    return result;
-};
 
 const pullGui = async () => {
     const scratchGui = pathUtil.join(__dirname, '../../dinosaurmod.github.io');

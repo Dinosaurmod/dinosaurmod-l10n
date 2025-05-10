@@ -49,7 +49,7 @@ const scratchGuiTranslations = pathUtil.join(scratchGui, 'translations');
 const scratchVm = VM;
 if (!isDirectorySync(scratchGui)) throw new Error('Cannot find scratch-gui');
 if (!isDirectorySync(scratchGuiTranslations)) throw new Error('Cannot find scratch-gui translations');
-//if (!isDirectorySync(scratchVm)) throw new Error('Cannot find scratch-vm');
+// if (!isDirectorySync(scratchVm)) throw new Error('Cannot find scratch-vm');
 
 /**
  * @typedef StructuredMessage
