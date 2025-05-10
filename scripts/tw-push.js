@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import pathUtil from 'node:path';
 import {txPush} from '../lib/transifex.js';
+import VM from 'scratch-vm';
 
 /* eslint-disable valid-jsdoc */
 
@@ -45,10 +46,10 @@ const recursiveReadDirectory = (directory) => {
 
 const scratchGui = pathUtil.join(__dirname, '..', '..', 'scratch-gui');
 const scratchGuiTranslations = pathUtil.join(scratchGui, 'translations');
-const scratchVm = pathUtil.join(__dirname, '..', '..', 'scratch-vm');
+const scratchVm = VM;
 if (!isDirectorySync(scratchGui)) throw new Error('Cannot find scratch-gui');
 if (!isDirectorySync(scratchGuiTranslations)) throw new Error('Cannot find scratch-gui translations');
-if (!isDirectorySync(scratchVm)) throw new Error('Cannot find scratch-vm');
+//if (!isDirectorySync(scratchVm)) throw new Error('Cannot find scratch-vm');
 
 /**
  * @typedef StructuredMessage
@@ -157,7 +158,7 @@ for (const [id, message] of Object.entries(allMessages)) {
 const push = async () => {
     try {
         console.log('UPLOADING to Transifex...');
-        const PROJECT = 'turbowarp';
+        const PROJECT = 'dinosaurmod';
         const RESOURCE = 'guijson';
         await txPush(PROJECT, RESOURCE, twMessages);
     } catch (error) {

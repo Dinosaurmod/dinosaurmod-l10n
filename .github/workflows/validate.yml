@@ -19,3 +19,13 @@ jobs:
       run: npm ci
     - name: Validate
       run: npm run test
+#  deploy:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+#      with:
+#        persist-credentials: false
+#    - run: npm run tw:pull
+#    - run: npm run tw:push
+#    - run: npm run tw:publish

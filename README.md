@@ -1,10 +1,10 @@
-# @turbowarp/scratch-l10n
+# @dinosaurmod/dinosaurmod-l10n
 
 This is a modified version of scratch-l10n with translations that aren't used by TurboWarp removed.
 
 ## Scripts
 
-This repository also contains scripts that we use to maintain TurboWarp's translations. They assume you have a directory laid out with `scratch-l10n`, `scratch-gui`, `turbowarp-desktop`, and `packager` in the same parent folder.
+This repository also contains scripts that we use to maintain TurboWarp's translations. They assume you have a directory laid out with `dinosaurmod.github.io` in the same parent folder. You can change that
 
 Download all translations from Transifex:
 

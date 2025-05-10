@@ -8,7 +8,7 @@ import {batchMap} from '../lib/batch.js';
 
 /* eslint-disable valid-jsdoc */
 
-const PROJECT = 'turbowarp';
+const PROJECT = 'dinosaurmod';
 const CONCURRENCY_LIMIT = 36;
 const SOURCE_LOCALE = 'en';
 
@@ -218,7 +218,7 @@ const generateSmallestLocaleNamesMap = messages => {
 };
 
 const pullGui = async () => {
-    const scratchGui = pathUtil.join(__dirname, '../../scratch-gui');
+    const scratchGui = pathUtil.join(__dirname, '../../dinosaurmod.github.io');
     if (!isDirectorySync(scratchGui)) {
         console.log('Skipping editor; could not find scratch-gui.');
         return;
@@ -234,114 +234,10 @@ const pullGui = async () => {
     fs.writeFileSync(addonsTranslationsFile, JSON.stringify(addonsTranslations, null, 4));
 };
 
-const pullPackager = async () => {
-    const packager = pathUtil.join(__dirname, '../../packager');
-    if (!isDirectorySync(packager)) {
-        console.log('Skipping packager; could not find packager.');
-        return;
-    }
-
-    const translations = await pullResource('packagerjson', 0.5);
-
-    // Delete old JSON files. Some languages that were previously supported might no longer be.
-    const localesDirectory = pathUtil.join(packager, 'src', 'locales');
-    for (const name of fs.readdirSync(localesDirectory)) {
-        if (name.endsWith('.json') && name !== 'en.json') {
-            fs.unlinkSync(pathUtil.join(localesDirectory, name));
-        }
-    }
-
-    // Write the individual JSON files
-    for (const [locale, messages] of Object.entries(translations)) {
-        const path = pathUtil.join(localesDirectory, `${locale}.json`);
-        fs.writeFileSync(path, JSON.stringify(messages, null, 4));
-    }
-
-    // Write the index.js manifest
-    const index = pathUtil.join(localesDirectory, 'index.js');
-    const oldContent = fs.readFileSync(index, 'utf-8');
-    const newContent = oldContent.replace(/\/\*===\*\/[\s\S]+\/\*===\*\//m, `/*===*/\n${
-        Object.keys(translations)
-            .map(i => `  ${JSON.stringify(i)}: () => require(${JSON.stringify(`./${i}.json`)})`)
-            .join(',\n')
-    },\n  /*===*/`);
-    fs.writeFileSync(index, newContent);
-
-    // Write locale-names.json
-    const localeNames = generateSmallestLocaleNamesMap(translations);
-    fs.writeFileSync(pathUtil.join(localesDirectory, 'locale-names.json'), JSON.stringify(localeNames, null, 4));
-};
-
-const pullDesktop = async () => {
-    const desktop = pathUtil.join(__dirname, '../../turbowarp-desktop');
-    if (!isDirectorySync(desktop)) {
-        console.log('Skipping desktop; could not find turbowarp-desktop.');
-        return;
-    }
-
-    // Desktop app translations
-    const desktopTranslations = await pullResource('desktopnewjson', 0.5);
-    fs.writeFileSync(
-        pathUtil.join(desktop, 'src-main/l10n/generated-translations.json'),
-        JSON.stringify(desktopTranslations, null, 4)
-    );
-
-    // Website translations
-    const webTranslations = await pullResource('desktopturbowarporg-redesign', 0.7);
-    const localeNames = generateSmallestLocaleNamesMap(webTranslations);
-    const indexHtml = pathUtil.join(desktop, 'docs', 'index.html');
-    const oldContent = fs.readFileSync(indexHtml, 'utf-8');
-    const newContent = oldContent
-        .replace(
-            / *<!-- L10N_START -->[\s\S]*?<!-- L10N_END -->/gm,
-            [
-                '<!-- L10N_START -->',
-                ...Object.entries(webTranslations).map(([locale, data]) => (
-                    `<script type="generated-translations" data-locale="${locale}">${JSON.stringify(data)}</script>`
-                )),
-                '<!-- L10N_END -->'
-            ].map(line => `    ${line}`).join('\n')
-        )
-        .replace(
-            /<script type="generated-locale-names">[\s\S]+?<\/script>/,
-            `<script type="generated-locale-names">${JSON.stringify(localeNames)}</script>`
-        );
-    fs.writeFileSync(indexHtml, newContent);
-
-    const storeListings = await pullResource('store-listingsyaml', 1);
-    fs.writeFileSync(
-        pathUtil.join(desktop, 'store-listings/imported.json'),
-        JSON.stringify(storeListings, null, 4)
-    );
-};
-
-const pullExtensions = async () => {
-    const extensions = pathUtil.join(__dirname, '../../extensions');
-    if (!isDirectorySync(extensions)) {
-        console.log('Skipping extensions; could not find extensions.');
-        return;
-    }
-
-    const metadataTranslations = await pullResource('extension-metadata', 0);
-    fs.writeFileSync(
-        pathUtil.join(extensions, 'translations/extension-metadata.json'),
-        JSON.stringify(metadataTranslations, null, 4)
-    );
-
-    const runtimeTranslations = await pullResource('extensions', 0);
-    fs.writeFileSync(
-        pathUtil.join(extensions, 'translations/extension-runtime.json'),
-        JSON.stringify(runtimeTranslations, null, 4)
-    );
-};
-
 const pullEverything = async () => {
     try {
         console.log('DOWNLOADING from Transifex...');
         await pullGui();
-        await pullPackager();
-        await pullDesktop();
-        await pullExtensions();
     } catch (e) {
         console.error(e);
         process.exit(1);
